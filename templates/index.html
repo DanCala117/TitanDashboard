@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUSC Units Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+<div class="container-fluid dashboard-container">
+    <div class="dashboard-header w-100 d-flex flex-wrap align-items-center justify-content-between gap-3" style="margin-top:0;">
+        <div class="d-flex align-items-center gap-3">
+            <h4 class="dashboard-title mb-0"><i class="bi bi-cpu"></i> Titan TUSC Dashboard</h4>
+            <span id="summary-last-updated" class="text-secondary small">Updating...</span>
+            
+            <!-- Unit Count Indicators -->
+            <div class="d-flex align-items-center gap-2 ms-2 status-counts">
+                <div class="status-count-item">
+                    <span class="status-count-label">Total:</span>
+                    <span id="count-total" class="status-count-value">-</span>
+                </div>
+                <div class="status-count-item">
+                    <span class="status-count-label">Ready:</span>
+                    <span id="count-ready" class="status-count-value status-ready">-</span>
+                </div>
+                <div class="status-count-item">
+                    <span class="status-count-label">Running:</span>
+                    <span id="count-running" class="status-count-value status-running">-</span>
+                </div>
+                <div class="status-count-item">
+                    <span class="status-count-label">Error:</span>
+                    <span id="count-error" class="status-count-value status-error">-</span>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <div class="input-group input-group-sm" style="width:220px;">
+                <span class="input-group-text bg-transparent text-secondary border-secondary"><i class="bi bi-search"></i></span>
+                <input id="unit-search" type="text" class="form-control bg-transparent text-light border-secondary" placeholder="Search units...">
+            </div>
+            <select id="status-filter" class="form-select form-select-sm bg-transparent text-light border-secondary" style="width:auto;min-width:140px;">
+                <option value="">All Statuses</option>
+                <option value="ready">Ready</option>
+                <option value="running">Running</option>
+                <option value="busy">Busy</option>
+                <option value="error">Error</option>
+            </select>
+            <button id="refresh-btn" class="btn btn-sm btn-outline-light"><i class="bi bi-arrow-clockwise"></i></button>
+            <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="auto-refresh-toggle" checked>
+                <label class="form-check-label small" for="auto-refresh-toggle">Auto Refresh</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="units-grid" id="units-container" aria-live="polite">
+        <!-- Cards injected by JS -->
+    </div>
+</div>
+<script>
+
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
