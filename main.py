@@ -64,6 +64,18 @@ units_cache = []
 cache_lock = threading.Lock()
 is_initial_load = True
 
+# dan
+def get_test_plans():
+    url = f'http://{SERVER_ADDRESS}/testrail/index.php?/api/v2/get_plans/{PROJECT_ID}'
+    auth = (TESTRAIL_EMAIL, TESTRAIL_API_KEY)
+    headers = {'Content-Type': 'application/json'}
+    response = requests.get(url, auth=auth)
+    
+    if response.status_code != 200:
+        return response.json()
+    else:
+        return None
+
 def load_units_to_cache():
     global is_initial_load
     
@@ -76,6 +88,7 @@ def load_units_to_cache():
         keys = redis_client.keys('*')
         unique_units = set(k.split('.')[0] for k in keys)
         
+        # idk, it just works
         yesterday_timestamp = 1660587200
         
         test_run = client.send_get(f'get_runs/{PROJECT_ID}&created_after={yesterday_timestamp}')
@@ -86,13 +99,9 @@ def load_units_to_cache():
                 tag = redis_client.get(f'{unit}.tag')
                 status = redis_client.get(f'{unit}.status')
                 
-
                 today = datetime.date.today()
-                # print(f"Yesterday's timestamp: {yesterday_timestamp}")
                 
-                test_plan = client.send_get(f'get_plans/{PROJECT_ID}')
-                
-                status_data = None
+                run_status_data = None
                 if len(test_run.get('runs', [])):
                     for run in test_run.get('runs', []):
                         description = run.get('description') or ''
@@ -100,6 +109,7 @@ def load_units_to_cache():
                         tusc_id = match.group(1) if match else None
 
                         if tusc_id == unit:
+                            in_progress_count = run.get('in_progress_count', 0) or 0
                             passed_count = run.get('passed_count', 0) or 0
                             failed_count = run.get('failed_count', 0) or 0
                             untested_count = run.get('untested_count', 0) or 0
@@ -110,10 +120,11 @@ def load_units_to_cache():
                             setup_issue_count = run.get('setup_issue_count', 0) or 0
                             total_count = passed_count + failed_count + untested_count + retest_count + blocked_count
                             passed_percentage = (passed_count / total_count * 100) if total_count > 0 else 0
-                            status_data = {
+                            run_status_data = {
                                 "id": run.get('id'),
                                 "name": run.get('name'),
                                 "state": run.get('state'),
+                                "in_progress_count": in_progress_count,
                                 "passed_count": passed_count,
                                 "failed_count": failed_count,
                                 "untested_count": untested_count,
@@ -141,14 +152,16 @@ def load_units_to_cache():
                         'tag': tag,
                         'status': status,
                         'redis_key': unit,
-                        'testrail_status': '' if status_data is None else status_data
+                        'testrail_status': '' if run_status_data is None else run_status_data
                     })
+
+                    
                     
                     # Add unit to cache immediately
                     with cache_lock:
                         units_cache.append(obj_unit)
                         
-                    print(f"Loaded TUSC: {unit} | Address: {address} | Tag: {tag} | Status: {status}")
+                    print(f"Loaded TUSC: {unit} | Address: {address} | Tag: {tag} | Status: {status} | Test")
                     
                 # In subsequent refreshes, also update existing units
                 elif not is_initial_load:
@@ -190,7 +203,6 @@ def unit_details(unit_id):
         pattern = f"{unit_id}.*"
         all_keys = redis_client.keys(pattern)
         all_keys = [key for key in all_keys if "customparameters" not in key]
-
 
         print(pattern, all_keys)
         

@@ -100,6 +100,11 @@ function renderUnits(units) {
                   })()}
                 </span>
             </div>
+
+            <div class="card-info-item" style="font-size:var(--tusc-font-base);">
+                <span class="card-info-label">Test Run Name:</span>
+                <span class="card-info-value" title="${unit.testrail_status.name || '-'}">${unit.testrail_status.name || '-'}</span>
+            </div>
             
             <div class="card-info-item" style="font-size:var(--tusc-font-base);">
                 <span class="card-info-label">Run ID:</span>
@@ -116,8 +121,8 @@ function renderUnits(units) {
             </div>
 
             <div class="card-info-item" style="font-size:var(--tusc-font-base);">
-                <span class="card-info-label">Test Run Name:</span>
-                <span class="card-info-value" title="${unit.name || '-'}">${unit.name || '-'}</span>
+                <span class="card-info-label">Current Script Testing:</span>
+                <span class="card-info-value" title="${unit.testrail_status.in_progress || '-'}">${unit.testrail_status.in_progress || '-'}</span>
             </div>
             
             <hr class="my-2">
@@ -164,6 +169,7 @@ function renderUnits(units) {
                                 <div class="tusc-legend-row"><span class="tusc-swatch" style="background:#F527E4"></span>Resets: ${unexpected_reset}</div>
                                 <div class="tusc-legend-row"><span class="tusc-swatch" style="background:#F5A927"></span>Error: ${error}</div>
                                 <div class="tusc-legend-row"><span class="tusc-swatch" style="background:#B027F5"></span>Setup: ${setup_issue}</div>
+                                <div class="tusc-legend-row"><span class="tusc-swatch" style="background:#B027F5"></span>In Progress: ${""}</div>
                             </div>
                         </div>
                     </div>`;
